@@ -12,7 +12,7 @@ class ROC(AbstractIndicator):
 
     def compute(self, frame: pd.DataFrame, **kwargs) -> pd.DataFrame:
         frame[self.name] = frame[self.column].transform(
-            lambda x: x.pct_change(periods=self.period)
+            lambda x: round(x.pct_change(periods=self.period), 2)
         )
 
         return frame

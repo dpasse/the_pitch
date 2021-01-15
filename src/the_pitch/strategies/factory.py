@@ -1,79 +1,58 @@
 from typing import List, Tuple
-
-from ..domain import PandasColumnRuleValue, SingleRule, LogicalOperator
-from ..indicators import SMA, AbstractIndicator
-from ..domain import Strategy, Condition, EntrySettings, Side
-from . import StrategyType
+from ..indicators import SMA, PercentLess, PercentMore, AbstractIndicator
+from ..domain import Strategy, Side
+from ..conditions import ConditionFactory
 
 
 class StrategyFactory(object):
 
     @staticmethod
-    def create(id: str, symbols: List[str], strategy_type: StrategyType) -> Tuple[Strategy, List[AbstractIndicator]]:
+    def create_sma_cross_price(id: str, symbols: List[str], period1: int) -> Tuple[Strategy, List[AbstractIndicator]]:
+        sma_1 = SMA('close', period1)
 
-        if strategy_type == StrategyType.SMA50_X_SMA200:
-            sma_50 = SMA('close', 50)
-            sma_200 = SMA('close', 200)
+        conditions = []
+        conditions.extend(ConditionFactory.create_cross(symbols, Side.Buy, 'close', sma_1.name))
+        conditions.extend(ConditionFactory.create_cross(symbols, Side.Sell, sma_1.name, 'close'))
 
-            conditions = []
-            for symbol in symbols:
-                ## buy when,
-                conditions.append(
-                    Condition(
-                        settings=EntrySettings(
-                            symbol=symbol,
-                            side=Side.Buy,
-                            quantity=1,
-                            stopLoss=None
-                        ),
-                        rules=[
-                            SingleRule(
-                                PandasColumnRuleValue(sma_50.name),
-                                LogicalOperator.LessThan,
-                                PandasColumnRuleValue(sma_200.name),
-                                time_step=-2,
-                            ),
-                            SingleRule(
-                                PandasColumnRuleValue(sma_50.name),
-                                LogicalOperator.GreaterThan,
-                                PandasColumnRuleValue(sma_200.name),
-                                time_step=-1,
-                            ),
-                        ]
-                    )
-                )
+        strategy = Strategy(
+            id,
+            description='Buy: close goes above SMA\nSell: close goes below SMA',
+            conditions=conditions
+        )
 
-                ## sell when,
-                conditions.append(
-                    Condition(
-                        settings=EntrySettings(
-                            symbol=symbol,
-                            side=Side.Sell,
-                            stopLoss=None
-                        ),
-                        rules=[
-                            SingleRule(
-                                PandasColumnRuleValue(sma_50.name),
-                                LogicalOperator.GreaterThan,
-                                PandasColumnRuleValue(sma_200.name),
-                                time_step=-2,
-                            ),
-                            SingleRule(
-                                PandasColumnRuleValue(sma_50.name),
-                                LogicalOperator.LessThan,
-                                PandasColumnRuleValue(sma_200.name),
-                                time_step=-1,
-                            ),
-                        ]
-                    )
-                )
+        return (strategy, [ sma_1 ])
 
-            strategy = Strategy(
-                id,
-                description='Buy: SMA 50 goes above SMA 200\nSell: SMA 50 goes below SMA 200',
-                conditions=conditions
-            )
+    @staticmethod
+    def create_price_revert_to_sma(id: str, symbols: List[str], period1: int) -> Tuple[Strategy, List[AbstractIndicator]]:
+        sma_1 = SMA('close', period1)
+        pl = PercentLess(sma_1.name, .10)
+        pm = PercentMore(sma_1.name, .10)
 
-            return (strategy, [ sma_50, sma_200 ])
+        conditions = []
+        conditions.extend(ConditionFactory.create_cross(symbols, Side.Buy, pl.name, 'close'))
+        conditions.extend(ConditionFactory.create_cross(symbols, Side.Sell, 'close', pm.name))
 
-        raise NotImplementedError()
+        strategy = Strategy(
+            id,
+            description='Buy: close goes above SMA - 10% \nSell: close goes below SMA + 10%',
+            conditions=conditions
+        )
+
+        return (strategy, [ sma_1, pl, pm ])
+
+    @staticmethod
+    def create_sma_cross_sma(id: str, symbols: List[str], period1: int, period2: int, ) -> Tuple[Strategy, List[AbstractIndicator]]:
+        sma_1 = SMA('close', period1)
+        sma_2 = SMA('close', period2)
+
+        conditions = []
+        conditions.extend(ConditionFactory.create_cross(symbols, Side.Buy, sma_1.name, sma_2.name))
+        conditions.extend(ConditionFactory.create_cross(symbols, Side.Sell, sma_2.name, sma_1.name))
+
+        strategy = Strategy(
+            id,
+            description='Buy: SMA 1 goes above SMA 2\nSell: SMA 1 goes below SMA 2',
+            conditions=conditions
+        )
+
+        return (strategy, [ sma_1, sma_2 ])

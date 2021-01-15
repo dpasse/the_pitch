@@ -11,7 +11,7 @@ class EMA(AbstractIndicator):
 
     def compute(self, df: pd.DataFrame, **kwargs) -> pd.DataFrame:
         df[self.name] = df[self.column].transform(
-            lambda x: x.ewm(span=self.period).mean()
+            lambda x: round(x.ewm(span=self.period).mean(), 2)
         )
 
         return df
