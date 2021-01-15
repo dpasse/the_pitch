@@ -8,3 +8,4 @@ from .position import Position
 from .condition import Condition
 from .portfolio import Portfolio
 from .strategy import Strategy
+from .simulation_dataset import SimulationDataset

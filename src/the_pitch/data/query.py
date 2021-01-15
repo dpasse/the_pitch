@@ -3,8 +3,7 @@ import numpy as np
 import pandas as pd
 import pandas_datareader.data as web
 
-from ..domain import StockPrice
-from .dataset import Dataset
+from ..domain import StockPrice, SimulationDataset
 
 
 class Query(object):
@@ -58,7 +57,7 @@ class Query(object):
         return (df_setup_data, df_test_data)
 
     @staticmethod
-    def query_for_dataset(symbols: str, start: str = '2000-01-01', now: str = '2011-01-01', end: str = '2021-01-01') -> Dataset:
+    def query_for_dataset(symbols: str, start: str = '2000-01-01', now: str = '2011-01-01', end: str = '2021-01-01') -> SimulationDataset:
         df = Query.get_pricing_data(symbols=symbols, start=start, end=end)
         dfs, dft = Query.split(df, now)
 
@@ -72,4 +71,23 @@ class Query(object):
 
             test_data[key].append(row)
 
-        return Dataset(data, test_data)
+        return SimulationDataset(data, test_data)
+
+    @staticmethod
+    def load_dataset(csv: str, now: str = '2011-01-01') -> SimulationDataset:
+        df = pd.read_csv(csv, index_col=None)
+        df.date = pd.to_datetime(df.date)
+
+        dfs, dft = Query.split(df, now)
+
+        data = StockPrice.create_many(dfs)
+
+        test_data: Dict[str, List[StockPrice]] = {}
+        for row in StockPrice.create_many(dft):
+            key = row.created_at
+            if key not in test_data:
+                test_data[key] = []
+
+            test_data[key].append(row)
+
+        return SimulationDataset(data, test_data)

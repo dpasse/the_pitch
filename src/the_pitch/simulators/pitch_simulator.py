@@ -1,13 +1,12 @@
 from typing import Dict, List
 from ..indicators import AbstractIndicator
-from ..data import Dataset
-from ..domain import Strategy, Portfolio, Position, AssetType, Side
+from ..domain import Strategy, Portfolio, Position, AssetType, Side, SimulationDataset
 from ..repositories import StockFrame
 
 
 class PitchSimulator(object):
 
-    def __init__(self, dataset: Dataset):
+    def __init__(self, dataset: SimulationDataset):
         self.data = dataset.data
         self.test_data = dataset.test_data
 
