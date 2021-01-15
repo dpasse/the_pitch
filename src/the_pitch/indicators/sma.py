@@ -1,5 +1,6 @@
 import pandas as pd
 from .abstract_indicator import AbstractIndicator
+from ..converters import utils
 
 
 class SMA(AbstractIndicator):
@@ -11,7 +12,7 @@ class SMA(AbstractIndicator):
 
     def compute(self, df: pd.DataFrame, **kwargs) -> pd.DataFrame:
         df[self.name] = df[self.column].transform(
-            lambda x: round(x.rolling(window=self.period).mean(), 2)
-        )
+            lambda x: x.rolling(window=self.period).mean()
+        ).map(utils.decimal_from_float)
 
         return df

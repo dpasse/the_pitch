@@ -1,6 +1,7 @@
 
 import pandas as pd
 from .abstract_indicator import AbstractIndicator
+from ..converters import utils
 
 
 class ROC(AbstractIndicator):
@@ -12,7 +13,7 @@ class ROC(AbstractIndicator):
 
     def compute(self, frame: pd.DataFrame, **kwargs) -> pd.DataFrame:
         frame[self.name] = frame[self.column].transform(
-            lambda x: round(x.pct_change(periods=self.period), 2)
-        )
+            lambda x: x.pct_change(periods=self.period)
+        ).map(utils.decimal_from_float)
 
         return frame

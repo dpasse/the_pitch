@@ -1,5 +1,6 @@
 import pandas as pd
 from .abstract_indicator import AbstractIndicator
+from ..converters import utils
 
 
 class MACD(AbstractIndicator):
@@ -15,12 +16,12 @@ class MACD(AbstractIndicator):
         # Calculate the Fast Moving MACD.
         df['macd_fast'] = df[self.column].transform(
             lambda x: x.ewm(span = self.fast_period, min_periods = self.fast_period).mean()
-        )
+        ).map(utils.decimal_from_float)
 
         # Calculate the Slow Moving MACD.
         df['macd_slow'] = df[self.column].transform(
             lambda x: x.ewm(span = self.slow_period, min_periods = self.slow_period).mean()
-        )
+        ).map(utils.decimal_from_float)
 
         # Calculate the Line.
         df['macd_line'] = df['macd_fast'] - df['macd_slow']

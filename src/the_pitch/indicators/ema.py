@@ -1,5 +1,6 @@
 import pandas as pd
 from .abstract_indicator import AbstractIndicator
+from ..converters import utils
 
 
 class EMA(AbstractIndicator):
@@ -11,7 +12,7 @@ class EMA(AbstractIndicator):
 
     def compute(self, df: pd.DataFrame, **kwargs) -> pd.DataFrame:
         df[self.name] = df[self.column].transform(
-            lambda x: round(x.ewm(span=self.period).mean(), 2)
-        )
+            lambda x: x.ewm(span=self.period).mean()
+        ).map(utils.decimal_from_float)
 
         return df

@@ -1,5 +1,6 @@
 import pandas as pd
 from .abstract_indicator import AbstractIndicator
+from ..converters import utils
 
 
 class Difference(AbstractIndicator):
@@ -12,6 +13,6 @@ class Difference(AbstractIndicator):
     def compute(self, df: pd.DataFrame, **kwargs) -> pd.DataFrame:
         df[self.name] = df[self.column].transform(
             lambda x: round(x.diff(periods=self.period), 2)
-        )
+        ).map(utils.decimal_from_float)
 
         return df

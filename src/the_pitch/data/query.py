@@ -2,7 +2,7 @@ from typing import Dict, List, Tuple
 import numpy as np
 import pandas as pd
 import pandas_datareader.data as web
-
+from ..converters import utils
 from ..domain import StockPrice, SimulationDataset
 
 
@@ -75,7 +75,7 @@ class Query(object):
 
     @staticmethod
     def load_dataset(csv: str, now: str = '2011-01-01') -> SimulationDataset:
-        df = pd.read_csv(csv, index_col=None)
+        df = pd.read_csv(csv, index_col=None, converters={ 'close': utils.decimal_from_value })
         df.date = pd.to_datetime(df.date)
 
         dfs, dft = Query.split(df, now)

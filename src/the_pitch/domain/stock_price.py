@@ -3,6 +3,7 @@ from decimal import Decimal
 from dataclasses import dataclass
 from typing import Tuple
 import pandas as pd
+from ..converters import utils
 
 
 @dataclass
@@ -52,10 +53,10 @@ class StockPrice(object):
                 StockPrice(
                     row['symbol'],
                     row['date'],
-                    Decimal(str(round(row['open'], 2))),
-                    Decimal(str(round(row['close'], 2))),
-                    Decimal(str(round(row['high'], 2))),
-                    Decimal(str(round(row['low'], 2))),
+                    utils.decimal_from_float(row['open']),
+                    utils.decimal_from_float(row['close']),
+                    utils.decimal_from_float(row['high']),
+                    utils.decimal_from_float(row['low']),
                     int(row['volume'])
                 )
             )
