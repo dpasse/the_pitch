@@ -1,0 +1,5 @@
+pytest
+pandas
+pandas_datareader
+numpy
+pandas_ta
