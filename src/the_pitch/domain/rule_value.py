@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
 from decimal import Decimal
 from typing import List
-import pandas as pd
+
+from . import ConditionPayload, EntrySettings
 
 
 class AbstractRuleValue(ABC):
@@ -26,4 +27,8 @@ class PandasColumnRuleValue(AbstractRuleValue):
         self.last = last
 
     def get_values(self, **kwargs) -> List[Decimal]:
-        return kwargs['df'][self.column][self.last:].tolist()
+        conditon_payload: ConditionPayload = kwargs['condition_payload']
+        settings: EntrySettings = kwargs['settings']
+
+        df = conditon_payload.frame[self.column]
+        return df[self.last:].tolist()

@@ -1,6 +1,6 @@
-from typing import List, Dict
-from the_pitch.engines.pitch_engine import PitchEngine
-from ..domain import StockPrice, Strategy, Portfolio, Position
+from typing import List, DefaultDict
+from ..engines import PitchEngine
+from ..domain import StockPrice, Strategy, Portfolio, Position, StrategyEvaluationResponse, Pitch
 from ..indicators import AbstractIndicator
 from collections import defaultdict
 
@@ -17,20 +17,21 @@ class PortfolioWrapper(object):
         self.paper_money = paper_money
 
         ## history
-        self.strategy_operations = defaultdict(lambda: defaultdict(list))
+        self.strategy_operations: DefaultDict[str, DefaultDict[str, List[Position]]] = defaultdict(lambda: defaultdict(list))
 
-    def run(self, prices: List[StockPrice]) -> dict:
+    def run(self, pitch: Pitch) -> StrategyEvaluationResponse:
         self.portfolio.reload()
-        response = self.engine.run(prices, self.portfolio)
+
+        response = self.engine.run(pitch, self.portfolio)
 
         if self.paper_money:
-            self.portfolio.add_positions(response['buys'])
-            self.portfolio.remove_positions(response['sells'])
+            self.portfolio.add_positions(response.buys)
+            self.portfolio.remove_positions(response.sells)
 
-        for position in response['buys']:
+        for position in response.buys:
             self.strategy_operations[position.strategy_id][position.symbol].append(position)
 
-        for position in response['sells']:
+        for position in response.sells:
             self.strategy_operations[position.strategy_id][position.symbol].append(position)
 
         return response

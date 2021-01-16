@@ -23,13 +23,16 @@ class Scorer(object):
 
     @staticmethod
     def score_positions(operations: List[Position]) -> Decimal:
-        grouped_operations = list(Scorer.chunks(operations, 2))
+        price = Decimal('0.0')
 
+        if len(operations) == 0:
+            return price
+
+        grouped_operations = list(Scorer.chunks(operations, 2))
         if len(grouped_operations[-1]) == 1:
             ## the last position hasnt closed
             grouped_operations = grouped_operations[:-1]
 
-        price = Decimal('0.0')
         for row in grouped_operations:
             p1 = (row[1].quantity * row[1].purchase_price) ## should be larger,
             p2 = (row[0].quantity * row[0].purchase_price)

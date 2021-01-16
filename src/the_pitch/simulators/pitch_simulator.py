@@ -1,7 +1,7 @@
 from typing import Dict, List
 
 from ..indicators import AbstractIndicator
-from ..domain import Strategy, Portfolio, Position, SimulationDataset
+from ..domain import Strategy, Portfolio, SimulationDataset, Pitch
 from ..engines import PortfolioWrapper
 
 
@@ -20,6 +20,6 @@ class PitchSimulator(object):
         )
 
         for _, stock_prices in self.test_data.items():
-            engine.run(stock_prices)
+            engine.run(Pitch(stock_prices))
 
         return engine.strategy_operations

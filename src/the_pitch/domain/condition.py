@@ -1,12 +1,12 @@
 from typing import List, Optional
-from . import EntrySettings, AbstractRule, Position
+from . import EntrySettings, AbstractRule, ConditionPayload
 import numpy as np
 from .enums import Side
 import pandas as pd
 
 
 class Condition(object):
-    def __init__(self, settings: EntrySettings, rules: List[AbstractRule] = []):
+    def __init__(self, settings: EntrySettings, rules: Optional[List[AbstractRule]] = []):
         self.settings = settings
         self.rules = rules
 
@@ -14,12 +14,11 @@ class Condition(object):
     def side(self) -> Side:
         return self.settings.side
 
-    def is_valid(self, frame: pd.DataFrame, active_position: Optional[Position] = None, **kwargs) -> bool:
+    def is_valid(self, condition_payload: ConditionPayload, **kwargs) -> bool:
         parameters = dict(
             kwargs,
-            df=frame.loc[self.settings.symbol],
+            condition_payload= condition_payload,
             settings=self.settings,
-            active_position=active_position
         )
 
         output = np.all([
@@ -29,11 +28,13 @@ class Condition(object):
 
         if output:
 
-            if self.side == Side.Sell and active_position is None:
+            has_active_position = condition_payload.has_active_position
+
+            if self.side == Side.Sell and not has_active_position:
                 ## cant sell with no active positions
                 return False
 
-            if self.side == Side.Buy and active_position is not None:
+            if self.side == Side.Buy and has_active_position:
                 ## no buying with positions still active
                 return False
 

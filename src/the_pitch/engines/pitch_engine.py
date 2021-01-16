@@ -1,7 +1,5 @@
 from typing import List
-
-from the_pitch.domain import strategy
-from ..domain import Strategy, StockPrice, Portfolio, Position, Side
+from ..domain import Strategy, StockPrice, Portfolio, Position, Side, StrategyEvaluationResponse, Pitch, StrategyPayload
 from ..indicators import AbstractIndicator
 from ..repositories import StockFrame
 
@@ -10,21 +8,40 @@ class PitchEngine(object):
     def __init__(self, seed_prices: List[StockPrice], indicators: List[AbstractIndicator], strategies: List[Strategy]):
         self.stock_frame = StockFrame(
             prices=seed_prices,
-            indicators=indicators,
-            strategies=strategies
+            indicators=indicators
         )
 
-    def run(self, prices: List[StockPrice], portfolio: Portfolio) -> dict:
-        response = {
-            'buys': [],
-            'sells': [],
-        }
+        self.strategies = strategies
 
-        output = self.stock_frame.add_rows(prices, portfolio)
+    def run(self, pitch: Pitch, portfolio: Portfolio) -> StrategyEvaluationResponse:
+        self.stock_frame.add_rows(pitch.prices, portfolio)
 
-        if len(output.keys()):
-            price_by_symbol = { price.symbol: price for price in prices }
-            for strategy_id, conditions in output.items():
+        return self._evaluate_strategies(pitch, portfolio)
+
+    def _get_valid_conditions(self, portfolio: Portfolio) -> dict:
+        evals = {}
+
+        for strategy in self.strategies:
+            strategy_payload = StrategyPayload(
+                strategy.id,
+                self.stock_frame.df,
+                active_positions = { p.symbol: p for p in portfolio.get_positions_by_strategy(strategy.id) }
+            )
+
+            evals[strategy.id] = strategy.get_valid_conditions(strategy_payload)
+
+        return evals
+
+
+    def _evaluate_strategies(self, pitch: Pitch, portfolio: Portfolio) -> StrategyEvaluationResponse:
+        buys = []
+        sells = []
+
+        evals = self._get_valid_conditions(portfolio)
+
+        if len(evals.keys()):
+            price_by_symbol = { price.symbol: price for price in pitch.prices }
+            for strategy_id, conditions in evals.items():
                 for condition in conditions:
                     symbol = condition.settings.symbol
                     quantity = condition.settings.quantity
@@ -37,12 +54,13 @@ class PitchEngine(object):
                         assert_type,
                         quantity,
                         trigger_price.close,
-                        trigger_price.created_at
+                        trigger_price.created_at,
+                        condition.side
                     )
 
                     if condition.side == Side.Buy:
-                        response['buys'].append(position)
+                        buys.append(position)
                     else:
-                        response['sells'].append(position)
+                        sells.append(position)
 
-        return response
+        return StrategyEvaluationResponse(buys, sells)

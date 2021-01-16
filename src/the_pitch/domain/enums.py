@@ -1,7 +1,11 @@
 from enum import Enum
 
 
-class LogicalOperator(Enum):
+class AbstratEnum(Enum):
+    def as_int(self) -> int:
+        return self.value
+
+class LogicalOperator(AbstratEnum):
     Equal = 1
     NotEqual = 2
     LessThan = 3
@@ -9,33 +13,18 @@ class LogicalOperator(Enum):
     GreaterThan = 5
     GreaterThanOrEqual = 6
 
-    def as_int(self):
-        return self.value
-
-class ConditionOperator(Enum):
+class ConditionOperator(AbstratEnum):
     AND = 1
     OR = 2
 
-    def as_int(self):
-        return self.value
-
-class Unit(Enum):
+class Unit(AbstratEnum):
     Price = 1
     Stock = 2
     Percentage = 3
 
-    def as_int(self):
-        return self.value
-
-class Side(Enum):
+class Side(AbstratEnum):
     Buy = 1
     Sell = 2
 
-    def as_int(self):
-        return self.value
-
-class AssetType(Enum):
+class AssetType(AbstratEnum):
     Equity = 1
-
-    def as_int(self):
-        return self.value

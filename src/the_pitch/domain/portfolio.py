@@ -18,20 +18,20 @@ class Portfolio(object):
             self.remove_position(position.strategy_id, position.symbol)
 
     def remove_position(self, strategy_id: str, symbol: str) -> None:
-        if symbol in self.active_positions.keys():
-            self.active_positions[strategy_id] = filter(
+        if strategy_id in self.active_positions:
+            self.active_positions[strategy_id] = list(filter(
               lambda p: p.symbol != symbol,
               self.active_positions[strategy_id],
-            )
+            ))
 
     def get_positions_by_strategy(self, strategy_id: str) -> List[Position]:
         return self.active_positions[strategy_id]
 
     def get_positions(self, strategy_id: str, symbol: str) -> List[Position]:
-        return filter(
+        return list(filter(
           lambda p: p.symbol == symbol,
           self.get_positions_by_strategy(strategy_id)
-        )
+        ))
 
     def cache(self):
         if self.cache_path is None:

@@ -1,7 +1,6 @@
-from typing import Dict, List
-from . import Condition, Position
-
-import pandas as pd
+from ast import Str
+from typing import List
+from . import Condition, StrategyPayload, ConditionPayload
 
 
 class Strategy(object):
@@ -14,14 +13,15 @@ class Strategy(object):
         self.description = description
         self.conditions = conditions
 
-    def get_valid_conditions(self, frame: pd.DataFrame, active_positions: Dict[str, Position], **kwargs) -> List[Condition]:
+    def get_valid_conditions(self, strategy_payload: StrategyPayload, **kwargs) -> List[Condition]:
         valid_conditions = []
         for condition in self.conditions:
-            active_position: Position = None
-            if condition.settings.symbol in active_positions:
-                active_position = active_positions[condition.settings.symbol]
+            condition_payload = ConditionPayload(
+                symbol=condition.settings.symbol,
+                strategy_payload=strategy_payload
+            )
 
-            if condition.is_valid(frame, active_position, **kwargs):
+            if condition.is_valid(condition_payload, **kwargs):
                 valid_conditions.append(condition)
 
         return valid_conditions
