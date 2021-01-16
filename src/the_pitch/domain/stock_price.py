@@ -1,7 +1,7 @@
 from datetime import datetime
 from decimal import Decimal
 from dataclasses import dataclass
-from typing import Tuple
+from typing import List, Tuple
 import pandas as pd
 from ..converters import utils
 
@@ -46,7 +46,7 @@ class StockPrice(object):
         return [ self.open, self.close, self.high, self.low, self.volume ]
 
     @staticmethod
-    def create_many(df: pd.DataFrame):
+    def create_many_from_dataframe(df: pd.DataFrame):
         prices = []
         for _, row in df.iterrows():
             prices.append(
@@ -62,3 +62,23 @@ class StockPrice(object):
             )
 
         return prices
+
+    @staticmethod
+    def create_many_from_objects(objects: List[dict]):
+        prices = []
+        for object in objects:
+            prices.append(
+                StockPrice(
+                    object['symbol'],
+                    object['date'],
+                    utils.decimal_from_float(object['open']),
+                    utils.decimal_from_float(object['close']),
+                    utils.decimal_from_float(object['high']),
+                    utils.decimal_from_float(object['low']),
+                    int(object['volume'])
+                )
+            )
+
+        return prices
+
+    ### todo: add another that takes a list of dicts

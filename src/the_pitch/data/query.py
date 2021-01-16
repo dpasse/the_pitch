@@ -61,10 +61,10 @@ class Query(object):
         df = Query.get_pricing_data(symbols=symbols, start=start, end=end)
         dfs, dft = Query.split(df, now)
 
-        data = StockPrice.create_many(dfs)
+        data = StockPrice.create_many_from_dataframe(dfs)
 
         test_data: Dict[str, List[StockPrice]] = {}
-        for row in StockPrice.create_many(dft):
+        for row in StockPrice.create_many_from_dataframe(dft):
             key = row.created_at
             if key not in test_data:
                 test_data[key] = []
@@ -80,10 +80,10 @@ class Query(object):
 
         dfs, dft = Query.split(df, now)
 
-        data = StockPrice.create_many(dfs)
+        data = StockPrice.create_many_from_dataframe(dfs)
 
         test_data: Dict[str, List[StockPrice]] = {}
-        for row in StockPrice.create_many(dft):
+        for row in StockPrice.create_many_from_dataframe(dft):
             key = row.created_at
             if key not in test_data:
                 test_data[key] = []

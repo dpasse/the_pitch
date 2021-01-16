@@ -28,7 +28,5 @@ class PandasColumnRuleValue(AbstractRuleValue):
 
     def get_values(self, **kwargs) -> List[Decimal]:
         conditon_payload: ConditionPayload = kwargs['condition_payload']
-        settings: EntrySettings = kwargs['settings']
-
         df = conditon_payload.frame[self.column]
         return df[self.last:].tolist()
