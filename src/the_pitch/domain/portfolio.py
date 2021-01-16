@@ -1,13 +1,14 @@
 from collections import defaultdict
 from typing import Dict, List
 from . import Position
+from ..caches import Cache
 import json
 
 
 class Portfolio(object):
-    def __init__(self, cache_path: str = None):
+    def __init__(self, cache_service: Cache = Cache()):
         self.active_positions: Dict[str, List[Position]] = defaultdict(list)
-        self.cache_path = cache_path
+        self.cache_service = cache_service
 
     def add_positions(self, new_positions: List[Position]) -> None:
         for position in new_positions:
@@ -34,24 +35,15 @@ class Portfolio(object):
         ))
 
     def cache(self):
-        if self.cache_path is None:
-            return
-
         obj = {}
         for strategy_id, items in self.active_positions.items():
             obj[strategy_id] = [ item.to_obj() for item in items ]
 
-        contents = json.dumps(obj)
-        with open(self.cache_path, 'w') as output:
-            output.write(contents)
+        self.cache_service.write(obj)
 
     def reload(self):
-        if self.cache_path is None:
-            return
-
-        with open(self.cache_path, 'r') as input:
-            contents = input.read()
+        data = self.cache_service.read()
 
         self.active_positions = defaultdict(list)
-        for strategy_id, items in json.loads(contents).items():
+        for strategy_id, items in data.items():
             self.active_positions[strategy_id] = [ Position.create(item) for item in items ]
