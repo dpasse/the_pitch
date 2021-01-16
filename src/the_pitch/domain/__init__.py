@@ -10,5 +10,4 @@ from .condition import Condition
 from .portfolio import Portfolio
 from .strategy import Strategy
 from .simulation_dataset import SimulationDataset
-from .strategy_evaluation_response import StrategyEvaluationResponse
 from .pitch import Pitch
