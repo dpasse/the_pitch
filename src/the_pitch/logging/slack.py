@@ -1,9 +1,10 @@
 import json
 import sys
 import requests
+from . import AbstractLogger
 
 
-class Slack(object):
+class Slack(AbstractLogger):
 
     def __init__(self, uri: str):
         self.uri = uri

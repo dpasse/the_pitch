@@ -1,9 +1,8 @@
-from typing import List, DefaultDict
+from typing import List
 from ..engines import PitchEngine
-from ..domain import StockPrice, Strategy, Portfolio, Position, Pitch, Side
+from ..domain import StockPrice, Strategy, Position, Pitch
 from ..indicators import AbstractIndicator
 from ..managers import PortfolioManager
-from collections import defaultdict
 
 
 class PortfolioWrapper(object):
