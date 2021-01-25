@@ -1,20 +1,19 @@
 from datetime import datetime
 from decimal import Decimal
-from dataclasses import dataclass
 from typing import List, Tuple
 import pandas as pd
 from ..converters import utils
 
 
-@dataclass
 class StockPrice(object):
-    symbol: str
-    created_at: datetime
-    open: Decimal
-    close: Decimal
-    high: Decimal
-    low: Decimal
-    volume: int
+    def __init__(self, symbol: str, created_at: datetime, open: Decimal, close: Decimal, high: Decimal, low: Decimal, volume: int):
+        self.symbol = symbol
+        self.created_at = created_at
+        self.open = open
+        self.close = close
+        self.high = high
+        self.low = low
+        self.volume = volume
 
     @property
     def index(self) -> Tuple[str, datetime]:
@@ -80,5 +79,3 @@ class StockPrice(object):
             )
 
         return prices
-
-    ### todo: add another that takes a list of dicts

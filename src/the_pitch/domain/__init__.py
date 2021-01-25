@@ -1,5 +1,5 @@
 from .entry_settings import EntrySettings
-from .enums import LogicalOperator, ConditionOperator, Unit, Side, AssetType
+from .enums import LogicalOperator, ConditionOperator, Unit, Side, AssetType, ChartType
 from .order_target import StopLossAtPrice, OrderTarget
 from .stock_price import StockPrice
 from .position import Position

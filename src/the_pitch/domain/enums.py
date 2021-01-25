@@ -28,3 +28,10 @@ class Side(AbstratEnum):
 
 class AssetType(AbstratEnum):
     Equity = 1
+
+class ChartType(AbstratEnum):
+    OneMinute = 1
+    FiveMinutes = 2
+    FifteenMinutes = 3
+    ThrityMinutes = 4
+    OneDay = 5
