@@ -3,7 +3,7 @@ from setuptools import version
 
 setuptools.setup(
   name='the_pitch',
-  version="0.0.1.4",
+  version="0.0.1.7",
   description='',
   packages=setuptools.find_packages('src'),
   package_dir={'': 'src'},
