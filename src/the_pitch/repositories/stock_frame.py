@@ -1,4 +1,5 @@
-from typing import List, Optional
+import os
+from typing import List
 import numpy as np
 import pandas as pd
 from pandas.core.groupby import DataFrameGroupBy
@@ -8,15 +9,18 @@ from ..domain import StockPrice, Portfolio
 
 class StockFrame():
     def __init__(self, **kwargs) -> None:
-        if 'prices' in kwargs.keys():
-            self.df = pd.DataFrame(data=[ price.to_obj() for price in kwargs['prices'] ]).set_index(keys=StockPrice.index_columns())
-
-        if 'df' in kwargs.keys():
-            self.df: pd.DataFrame = kwargs['df'].set_index(keys=StockPrice.index_columns())
-
+        self.df: pd.DataFrame = None
         self.cache_path = None
+
         if 'cache_path' in kwargs:
-            self.cache_path: str = kwargs['cache_path']
+            self.cache_path = kwargs['cache_path']
+            if os.path.exists(self.cache_path):
+                ## use cache if available
+                self.df: pd.DataFrame = pd.read_csv(self.cache_path).set_index(keys=StockPrice.index_columns())
+
+        if self.df is not None:
+            if 'prices' in kwargs.keys():
+                self.df = pd.DataFrame(data=[ price.to_obj() for price in kwargs['prices'] ]).set_index(keys=StockPrice.index_columns())
 
         self.indicators: List[AbstractIndicator] = kwargs['indicators']
         self._refresh_indicators()
@@ -40,7 +44,6 @@ class StockFrame():
         )
 
         for indicator in self.indicators:
-
             calc = []
             for symbol in symbols:
                 output = indicator.compute(self.df.loc[symbol], **kwargs).reset_index()
