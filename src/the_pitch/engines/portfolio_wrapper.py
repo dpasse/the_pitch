@@ -1,15 +1,15 @@
 from typing import List
+
+from ..repositories import StockFrame
 from ..engines import PitchEngine
-from ..domain import StockPrice, Strategy, Position, Pitch
-from ..indicators import AbstractIndicator
+from ..domain import Strategy, Position, Pitch
 from ..managers import PortfolioManager
 
 
 class PortfolioWrapper(object):
-    def __init__(self, seed_prices: List[StockPrice], indicators: List[AbstractIndicator], strategies: List[Strategy], portfolio_manager: PortfolioManager):
+    def __init__(self, stock_frame: StockFrame, strategies: List[Strategy], portfolio_manager: PortfolioManager):
         self.engine = PitchEngine(
-            seed_prices=seed_prices,
-            indicators=indicators,
+            stock_frame=stock_frame,
             strategies=strategies
         )
 

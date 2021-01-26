@@ -1,9 +1,9 @@
-from typing import Dict, List
-
+from typing import List
 from ..managers import PlayMoneyPortfolioManager
 from ..indicators import AbstractIndicator
 from ..domain import Strategy, Portfolio, SimulationDataset, Pitch
 from ..engines import PortfolioWrapper
+from ..repositories import StockFrame
 
 
 class PitchSimulator(object):
@@ -14,9 +14,13 @@ class PitchSimulator(object):
     def run(self, indicators: List[AbstractIndicator], strategies: List[Strategy]):
         portfolio_manager = PlayMoneyPortfolioManager(Portfolio())
 
+        stock_frame = StockFrame(
+            prices=self.data,
+            indicators=indicators
+        )
+
         engine = PortfolioWrapper(
-            self.data,
-            indicators,
+            stock_frame,
             strategies,
             portfolio_manager
         )

@@ -5,12 +5,8 @@ from ..repositories import StockFrame
 
 
 class PitchEngine(object):
-    def __init__(self, seed_prices: List[StockPrice], indicators: List[AbstractIndicator], strategies: List[Strategy]):
-        self.stock_frame = StockFrame(
-            prices=seed_prices,
-            indicators=indicators
-        )
-
+    def __init__(self, stock_frame: StockFrame, strategies: List[Strategy]):
+        self.stock_frame = stock_frame
         self.strategies = strategies
 
     def run(self, pitch: Pitch, portfolio: Portfolio) -> List[Position]:

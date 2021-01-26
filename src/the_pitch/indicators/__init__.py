@@ -8,3 +8,4 @@ from .bollinger_bands import BollingerBands
 from .macd import MACD
 from .percent_less import PercentLess
 from .percent_more import PercentMore
+from .gap import Gap

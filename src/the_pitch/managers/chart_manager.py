@@ -42,16 +42,16 @@ class ChartManager(object):
 
     def wait_till_next_bar(self, latest_bar: datetime) -> None:
         next_bar = self.get_next_expected_bar(latest_bar)
-        curr_bar = datetime.now(tz=timezone.utc) - timedelta(minutes=0)
+        curr_bar = datetime.utcnow()
 
-        delta = int(next_bar.timestamp()) - int(curr_bar.timestamp())
+        delta = (next_bar.replace(tzinfo=None) - curr_bar.replace(tzinfo=None)).seconds
         return 0 if delta < 0 else delta
 
     def get_historical_timeframe(self, historical_periods: int) -> Tuple[datetime, datetime]:
         start_date = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=1)
         return (
-            start_date,
-            start_date - timedelta(days=historical_periods)
+            start_date - timedelta(days=historical_periods),
+            start_date
         )
 
     @staticmethod

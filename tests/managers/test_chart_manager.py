@@ -48,5 +48,5 @@ def test_get_historical_timeframe():
     now = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
     start, end = ChartManager(ChartType.OneDay).get_historical_timeframe(15)
 
-    assert(now > start)
-    assert(now - timedelta(delta+1) == end)
+    assert(now - timedelta(delta+1) == start)
+    assert(now > end)
