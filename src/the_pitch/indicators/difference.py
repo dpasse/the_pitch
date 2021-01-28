@@ -12,7 +12,7 @@ class Difference(AbstractIndicator):
 
     def compute(self, df: pd.DataFrame, **kwargs) -> pd.DataFrame:
         df[self.name] = df[self.column].transform(
-            lambda x: round(x.diff(periods=self.period), 2)
-        ).map(utils.decimal_from_float)
+            lambda x: x.diff(periods=self.period)
+        ).fillna(0.0).map(utils.decimal_from_float)
 
         return df

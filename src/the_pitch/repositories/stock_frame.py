@@ -33,6 +33,9 @@ class StockFrame():
                 self.df = pd.DataFrame(data=[ price.to_obj() for price in kwargs['prices'] ]).set_index(keys=StockPrice.index_columns())
 
         self.indicators: List[AbstractIndicator] = kwargs['indicators']
+        self.symbols = np.unique(
+            list(map(lambda index: index[0], self.df.index))
+        )
         self._refresh_indicators()
 
     @property
@@ -48,19 +51,18 @@ class StockFrame():
 
     def _refresh_indicators(self, **kwargs) -> None:
         self.df.sort_index(inplace=True)
-
-        symbols = np.unique(
-            list(map(lambda index: index[0], self.df.index))
-        )
-
         for indicator in self.indicators:
             calc = []
-            for symbol in symbols:
-                output = indicator.compute(self.df.loc[symbol].copy(), **kwargs).reset_index()
-                output['symbol'] = symbol
+            for symbol in self.symbols:
+                df_updated = indicator.compute(
+                    self.df.loc[symbol].copy(),
+                    **kwargs
+                ).reset_index()
+                df_updated['symbol'] = symbol
 
-                calc.append(output)
+                calc.append(df_updated)
 
+            ## recreate df,
             self.df = pd.concat(calc).set_index(keys=StockPrice.index_columns()).sort_index()
 
         self._cache()

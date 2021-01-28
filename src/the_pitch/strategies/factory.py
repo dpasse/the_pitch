@@ -42,7 +42,7 @@ class StrategyFactory(object):
         return (strategy, [ sma_1, pl, pm ])
 
     @staticmethod
-    def create_sma_cross_sma(id: str, symbols: List[str], period1: int, period2: int, ) -> Tuple[Strategy, List[AbstractIndicator]]:
+    def create_sma_cross_sma(id: str, symbols: List[str], period1: int, period2: int) -> Tuple[Strategy, List[AbstractIndicator]]:
         sma_1 = SMA('close', period1)
         sma_2 = SMA('close', period2)
 
